@@ -1,7 +1,6 @@
 package com.example.todolist.controller;
 
 import com.example.todolist.model.nosql.TodoItemDocument;
-import com.example.todolist.model.search.TodoItemSearch;
 import com.example.todolist.model.sql.TodoItemEntity;
 import com.example.todolist.service.TodoItemService;
 import lombok.AllArgsConstructor;
@@ -25,7 +24,7 @@ public class TodoItemController {
     }
 
     @GetMapping("/search/{name}")
-    public List<TodoItemSearch> getItemsFromMongo(@PathVariable String name) {
+    public List<TodoItemEntity> getItemsFromMongo(@PathVariable String name) {
         return todoItemService.search(name);
     }
 
