@@ -11,7 +11,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class TransactionManagerConfiguration {
     @Bean
     @Primary
-    public ChainedTransactionManager chainedTransactionManager(@Qualifier("primaryTransactionManager") PlatformTransactionManager primaryTransactionManager) {
-        return new ChainedTransactionManager(primaryTransactionManager);
+    public ChainedTransactionManager chainedTransactionManager(@Qualifier("primaryTransactionManager") PlatformTransactionManager primaryTransactionManager,
+                                                               @Qualifier("analyticsTransactionManager") PlatformTransactionManager analyticsTransactionManager) {
+        return new ChainedTransactionManager(primaryTransactionManager, analyticsTransactionManager);
     }
 }

@@ -23,6 +23,11 @@ public class TodoItemController {
         return todoItemService.findAllFromPostgre();
     }
 
+    @GetMapping("/get/{id}")
+    public TodoItemEntity getItemsFromPostgre(@PathVariable int id) {
+        return todoItemService.findById(id);
+    }
+
     @GetMapping("/search/{name}")
     public List<TodoItemEntity> getItemsFromMongo(@PathVariable String name) {
         return todoItemService.search(name);

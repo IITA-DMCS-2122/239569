@@ -3,6 +3,7 @@ package com.example.todolist.service;
 import com.example.todolist.model.nosql.TodoItemDocument;
 import com.example.todolist.model.sql.TodoItemEntity;
 import com.example.todolist.repository.nosql.TodoItemDocumentRepository;
+import com.example.todolist.repository.analytics.AnalyticsRepository;
 import com.example.todolist.repository.sql.TodoItemEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,11 @@ public class TodoItemService {
 
     private final TodoItemEntityRepository todoItemEntityRepository;
     private final TodoItemDocumentRepository todoItemDocumentRepository;
+    private final AnalyticsRepository analyticsRepository;
+
+    public TodoItemEntity findById(int id) {
+        return todoItemEntityRepository.findById(id).get();
+    }
 
     public List<TodoItemEntity> findAllFromPostgre() {
         return todoItemEntityRepository.findAll();
@@ -28,6 +34,7 @@ public class TodoItemService {
 
     public void saveItem(TodoItemEntity item) {
         todoItemEntityRepository.save(item);
+        analyticsRepository.save(item);
         todoItemDocumentRepository.save(convertEntityToDocument(item));
     }
 
