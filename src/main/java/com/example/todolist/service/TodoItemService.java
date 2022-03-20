@@ -1,5 +1,6 @@
 package com.example.todolist.service;
 
+import com.example.todolist.model.TodoItemDto;
 import com.example.todolist.model.nosql.TodoItemDocument;
 import com.example.todolist.model.sql.TodoItemEntity;
 import com.example.todolist.repository.nosql.TodoItemDocumentRepository;
@@ -10,7 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -20,16 +22,16 @@ public class TodoItemService {
     private final TodoItemDocumentRepository todoItemDocumentRepository;
     private final AnalyticsRepository analyticsRepository;
 
-    public TodoItemEntity findById(int id) {
-        return todoItemEntityRepository.findById(id).get();
+    public TodoItemDto findByUuid(UUID uuid) {
+        return convertToDto(todoItemEntityRepository.findByUuid(uuid));
     }
 
-    public List<TodoItemEntity> findAllFromPostgre() {
-        return todoItemEntityRepository.findAll();
+    public List<TodoItemDto> findAllFromPostgre() {
+        return todoItemEntityRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    public List<TodoItemDocument> findAllFromMongo() {
-        return todoItemDocumentRepository.findAll();
+    public List<TodoItemDto> findAllFromMongo() {
+        return todoItemDocumentRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     public void saveItem(TodoItemEntity item) {
@@ -39,26 +41,34 @@ public class TodoItemService {
     }
 
     @Transactional
-    public List<TodoItemEntity> search(String query) {
-        return todoItemEntityRepository.search(query);
+    public List<TodoItemDto> search(String query) {
+        return todoItemEntityRepository.search(query).stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     public void updateItem(TodoItemEntity item) {
-        Optional<TodoItemEntity> itemFound = todoItemEntityRepository.findById(item.getId());
-        if (itemFound.isPresent()) {
-            itemFound.get().setName(item.getName());
-            itemFound.get().setDone(item.isDone());
-            todoItemEntityRepository.save(itemFound.get());
-            todoItemDocumentRepository.save(convertEntityToDocument(itemFound.get()));
+        TodoItemEntity itemFound = todoItemEntityRepository.findByUuid(item.getUuid());
+        if (itemFound != null) {
+            itemFound.setName(item.getName());
+            itemFound.setDone(item.isDone());
+            todoItemEntityRepository.save(itemFound);
+            todoItemDocumentRepository.save(convertEntityToDocument(itemFound));
         }
     }
 
-    public void deleteItem(int id) {
-        todoItemEntityRepository.deleteById(id);
-        todoItemDocumentRepository.deleteById(id);
+    public void deleteItem(UUID uuid) {
+        todoItemEntityRepository.deleteByUuid(uuid);
+        todoItemDocumentRepository.deleteByUuid(uuid);
     }
 
     private TodoItemDocument convertEntityToDocument(TodoItemEntity todoItemEntity) {
-        return new TodoItemDocument(todoItemEntity.getId(), todoItemEntity.getName(), todoItemEntity.isDone());
+        return new TodoItemDocument(todoItemEntity.getId(), todoItemEntity.getUuid(), todoItemEntity.getName(), todoItemEntity.isDone());
+    }
+
+    private TodoItemDto convertToDto(TodoItemEntity todoItemEntity) {
+        return new TodoItemDto(todoItemEntity.getUuid(), todoItemEntity.getName(), todoItemEntity.isDone());
+    }
+
+    private TodoItemDto convertToDto(TodoItemDocument todoItemDocument) {
+        return new TodoItemDto(todoItemDocument.getUuid(), todoItemDocument.getName(), todoItemDocument.isDone());
     }
 }

@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
-
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +19,14 @@ public class TodoItemEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    private UUID uuid;
+
     @FullTextField
     private String name;
     private boolean done;
+
+    @PrePersist
+    protected void onCreate() {
+        setUuid(java.util.UUID.randomUUID());
+    }
 }

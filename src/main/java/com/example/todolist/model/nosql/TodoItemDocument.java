@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -15,6 +17,13 @@ public class TodoItemDocument {
     @Id
     private int id;
 
+    private UUID uuid;
+
     private String name;
     private boolean done;
+
+    @PrePersist
+    protected void onCreate() {
+        setUuid(java.util.UUID.randomUUID());
+    }
 }
