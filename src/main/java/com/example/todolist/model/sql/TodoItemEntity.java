@@ -24,9 +24,4 @@ public class TodoItemEntity {
     @FullTextField
     private String name;
     private boolean done;
-
-    @PrePersist
-    protected void onCreate() {
-        setUuid(java.util.UUID.randomUUID());
-    }
 }

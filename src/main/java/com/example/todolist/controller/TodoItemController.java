@@ -14,6 +14,11 @@ import java.util.UUID;
 public class TodoItemController {
     private final TodoItemService todoItemService;
 
+    @GetMapping("/countEvents")
+    public long countEvents() {
+        return todoItemService.countEvents();
+    }
+
     @GetMapping("/getItemsFromMongo")
     public List<TodoItemDto> getItemsFromMongo() {
         return todoItemService.findAllFromMongo();
