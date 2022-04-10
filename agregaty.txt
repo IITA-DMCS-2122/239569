@@ -1,0 +1,58 @@
+//wybierz todoitem, który nie jest zrobiony, a następnie posortuj od największego id
+[{
+    $match: {
+        done: false
+    }
+}, {
+    $sort: {
+        _id: -1
+    }
+}]
+
+
+//wybierz pola name z todoitem
+[{
+    $project: {
+        name: 1
+    }
+}]
+
+
+//dodaj pole priority z wartością 1 do dokumentów
+[{
+    $set: {
+        "priority": 1
+    }
+}]
+
+
+//grupuj dokumenty po name i policz je
+[{
+    $group: {
+        _id: "$name",
+        count: {
+            $count: {}
+        }
+    }
+}]
+
+
+//wybierz todoitem, który jest zrobiony, następnie grupuj po nazwie i policz ilość wystąpień, na końcu wybierz nazwę z największą ilością wystąpień
+[{
+    $match: {
+        done: true
+    }
+}, {
+    $group: {
+        _id: "$name",
+        count: {
+            $count: {}
+        }
+    }
+}, {
+    $sort: {
+        count: -1
+    }
+}, {
+    $limit: 1
+}]
